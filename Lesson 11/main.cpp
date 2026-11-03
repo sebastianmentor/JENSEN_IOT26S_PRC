@@ -1,105 +1,134 @@
 #include <iostream>
-#include <string>
+#include "student.h"
 
-int sensor_id_count = 1;
 
-class Sensor {
-    public:
-    int id;
-    double value;
-
-    Sensor(int id, double start_value){
-        // print value of id and value  
-        this -> id = id;
-        value = start_value; 
-    }
-
-    Sensor(){
-        value = 0.0;
-        id = sensor_id_count;
-        sensor_id_count++;
-    }    
-
-    void print(){
-        std::cout << id << " " << value << "\n";
-    }
-};
-
-typedef enum{
-    ESP32 = 1,
-    ARDUINO,
-    STM32,
-}MCUBrand;
-
-class MCU{
-    public:
-    std::string name;
-    MCUBrand brand;
-
-    MCU(std::string &name, MCUBrand brand)
-        : name(name), brand(brand){
-            std::cout << "We are now creating MCU " << name << " wiht brand" << brand << "\n"; 
-        }
+Student *create_student(){
+    std::string new_name;
+    std::string course;
+    int points = -1;
     
-    ~MCU(){
-        std::cout << "Lets end this MCU! Oveload it with 100V\nWe now have magic smoke!!\n";
+    std::cout << "Enter name on student: ";
+    std::cin >> new_name;
+
+    std::cout << "Enter course name: ";
+    std::cin >> course;
+
+    Student *s = new Student(new_name, course);
+
+    while (points < 0 || points > 100)
+    {
+        std::cout << "Enter points between 0 and 100: ";
+        std::cin >> points;
     }
 
-    void print(){
-        std::cout << brand << " " << name << "\n";
-    }
-    
-};
+    s -> points = points;
 
-class Buffert {
-    public:
-        int *data;
+    return s;
 
-        Buffert(int storlek) {
-            std::cout << "Allocate an int array of size " << storlek << "\n";
-            data = new int[storlek];
-        }
-
-        ~Buffert() {
-            std::cout << "Free an int array\n";
-            delete[] data;
-        }
-};
-
-void create_MCU(std::string& mcu_name, MCUBrand mcu_brand){
-    std::cout << "Starting create_MCU\n";
-    MCU local_MCU(mcu_name, mcu_brand);
-    local_MCU.print();
-    std::cout << "We have now created mcu and are leaving the create_MCU\n";
 }
 
-void create_buff(int size){
-    std::cout << "Starting create_buff\n";
-    Buffert local_buff(size);
-    std::cout << "Working with buffer\nWe are now done!\n";
+void grade_student(Student& s){
+    int normalized_points = s.points / 10;
+    switch (normalized_points)
+    {
+    case 10:
+        s.grade = 'A';
+        break;
+    case 9:
+        s.grade = 'A';
+        break;
+    case 8:
+        s.grade = 'B';
+        break;   
+    case 7:
+        s.grade = 'C';
+        break;
+    case 6:
+        s.grade = 'D';
+        break;
+    case 5:
+        s.grade = 'E';
+        break;                  
+    default:
+        s.grade = 'F';
+        break;
+    }
+}
+
+void run_program(Student **students, int max_students){
+    int total_students = 0;
+    while (true)
+    {
+        std::cout << "1. Add new student\n";
+        std::cout << "2. Print all student\n";
+        std::cout << "3. Grade student\n";
+        std::cout << "0. Exit\n";
+
+        int user_input;
+        std::cout << "Enter choice: ";
+        std::cin >> user_input;
+
+        if(user_input == 1){
+            if(total_students == max_students){
+                std::cout << "Maximum students! Cant add more students\n";
+                continue;
+            }
+
+            students[total_students] = create_student();
+            total_students++;
+
+            std::cout << "Remember to grade student!\n";
+
+        }
+        else if(user_input == 2){
+            for(int i = 0; i < total_students; i++){
+                students[i] -> print();
+            }
+        }
+        else if(user_input == 3){
+            std::string student_name;
+            std::cout << "Enter students name: ";
+            std::cin >> student_name;
+
+            bool student_found = false;
+
+            for(int i = 0; i < total_students; i++){
+                if(students[i] -> name == student_name){
+                    grade_student(*students[i]);
+                    student_found = true;
+                    break;
+                }
+            }
+
+            if(student_found){
+                std::cout << "Grade updated!\n";
+            }
+            else{
+                std::cout << "Could not find student with name "<<student_name <<"\n";
+            }
+        }
+        else if(user_input == 0){
+            std::cout << "Start cleaning upp\n";
+
+            for(int i = 0; i < total_students; i++){
+                delete students[i];
+            }
+
+            std::cout << "Cleaning done! Good bye!\n";
+
+            break;
+        }
+        else{
+            std::cout << "Invalid choice!\n";
+        }
+
+    }
     
 }
 
-int main() {
-    Sensor s1;
-    // std::cout << s1.value << "\n";
-    s1.print();
+int main(){
 
-    Sensor s2(123, 2.2);
-    // std::cout << s2.value << "\n";
-    s2.print();
-    std::string name = "UNO 3";
-    create_MCU(name, ARDUINO);
+    Student *students[10];
+    run_program(students, 10);
 
-    Buffert my_buff(10);
-    create_buff(100);
-
-
-    Sensor *my_sensors[10];
-
-
-    std::cout << "Exit program now!\n";
-
-
-    return 0;
- }
+}
