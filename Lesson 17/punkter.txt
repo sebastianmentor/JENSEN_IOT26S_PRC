@@ -1,0 +1,12 @@
+// Repetition av bland annat:
+// • C++-syntax.
+// • Klasser och objekt.
+// • Inkapsling.
+// • Arv.
+// • Polymorfism.
+// • STL.
+// • Testning.
+// • Felsökning.
+// • Programdesign.
+// • Tekniska begrepp på engelska.
+// • Reflektion över design- och implementationsval.
